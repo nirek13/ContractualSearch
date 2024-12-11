@@ -30,9 +30,10 @@ const SearchBar: React.FC = () => {
             const data = await response.text();
             return new Promise<any>((resolve, reject) => {
                 Papa.parse(data, {
-                    complete: (result) => resolve(result.data),
-                    error: (error) => reject(error)
+                    complete: (result: any) => resolve(result.data),
+                    error: (error: any) => reject(error)
                 });
+                
             });
         };
 
