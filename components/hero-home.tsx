@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import Papa from 'papaparse';
-import { FaUser, FaCalendarAlt, FaDollarSign, FaMapMarkerAlt, FaTools, FaChevronDown, FaChevronUp } from 'react-icons/fa';
+import { FaUser, FaCalendarAlt, FaDollarSign, FaMapMarkerAlt, FaTools, FaChevronDown, FaChevronUp  , FaBrain , FaSave} from 'react-icons/fa';
 import Logo from "@/components/ui/logo";
 import { FaEnvelope } from 'react-icons/fa';
 
@@ -97,6 +97,7 @@ const SearchBar: React.FC = () => {
     };
 
     const filteredContracts = contractsData.filter((contract) => {
+        const badindex = contract.id != 1
         const matchesSearchTerm = contract.title.toLowerCase().includes(searchTerm.toLowerCase());
         const matchesStatus = selectedStatus === 'All' || contract.status === selectedStatus;
         const matchesContractType = selectedContractType === 'All' || contract.contractType === selectedContractType;
@@ -116,7 +117,9 @@ const SearchBar: React.FC = () => {
             matchesCompanySize &&
             matchesLocation &&
             matchesDistance &&
-            matchesContractValue
+            matchesContractValue &&
+                badindex
+
         );
     });
 
@@ -225,35 +228,55 @@ const SearchBar: React.FC = () => {
                             </h3>
                             <span
                                 className={`px-3 py-1 rounded-full text-sm font-medium ${
-                                    contract.status === "Active" ? "bg-green-100 text-green-600" : "bg-red-100 text-red-600"
+                                    contract.status === "Active"
+                                        ? "bg-green-100 text-green-600"
+                                        : "bg-red-100 text-red-600"
                                 }`}
                             >
-                                {contract.status}
-                            </span>
+            {contract.status}
+        </span>
                         </div>
-                        <p className="text-sm text-gray-600 leading-6 mb-3">{contract.description}</p>
+                        <p className="text-sm text-gray-600 leading-6 mb-3">
+                            {contract.description}
+                        </p>
                         <div className="flex items-center gap-2 text-sm text-gray-700 mb-2">
-                            <FaUser /> Client: {contract.clientName}
-                        </div>
-                        <div className="flex items-center gap-2 text-sm text-gray-700 mb-2">
-                            <FaEnvelope /> Contact Email: {contract.value}
-                        </div>
-                        <div className="flex items-center gap-2 text-sm text-gray-700 mb-2">
-                            <FaTools /> Type: {contract.contractType}
+                            <FaUser/> Client: {contract.clientName}
                         </div>
                         <div className="flex items-center gap-2 text-sm text-gray-700 mb-2">
-                            <FaMapMarkerAlt /> Location: {contract.duration}
+                            <FaEnvelope/> Contact Email: {contract.value}
                         </div>
                         <div className="flex items-center gap-2 text-sm text-gray-700 mb-2">
-                            <FaCalendarAlt /> Contract Start Date: {contract.startdate}
+                            <FaTools/> Type: {contract.contractType}
+                        </div>
+                        <div className="flex items-center gap-2 text-sm text-gray-700 mb-2">
+                            <FaMapMarkerAlt/> Location: {contract.duration}
+                        </div>
+                        <div className="flex items-center gap-2 text-sm text-gray-700 mb-2">
+                            <FaCalendarAlt/> Contract Start Date: {contract.startdate}
                         </div>
                         <div className="flex items-center gap-2 text-sm text-gray-700 mb-4">
-                            <FaCalendarAlt /> Publication Date: {contract.location}
+                            <FaCalendarAlt/> Publication Date: {contract.location}
                         </div>
-                        <button className="bg-blue-500 text-white py-2 px-4 rounded-full hover:bg-green-500 transition-colors duration-300 font-medium focus:outline-none">
-                            <a href={contract.link}>{contract.action}</a>
-                        </button>
+                        <div className="flex items-center gap-4">
+                            <button
+                                className="bg-blue-500 text-white py-2 px-4 rounded-full hover:bg-green-500 transition-colors duration-300 font-medium focus:outline-none">
+                                <a href={contract.link}>{contract.action}</a>
+                            </button>
+                            <button
+                                title="AI Summary"
+                                className="bg-gray-200 text-gray-600 p-2 rounded-full hover:bg-gray-300 transition-colors focus:outline-none"
+                            >
+                                <FaBrain/>
+                            </button>
+                            <button
+                                title="Save"
+                                className="bg-gray-200 text-gray-600 p-2 rounded-full hover:bg-gray-300 transition-colors focus:outline-none"
+                            >
+                                <FaSave/>
+                            </button>
+                        </div>
                     </div>
+
                 ))}
             </div>
         </div>
