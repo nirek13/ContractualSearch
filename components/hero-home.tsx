@@ -12,6 +12,11 @@ const CSV_URLS = [
     'https://canadabuys.canada.ca/opendata/pub/openTenderNotice-ouvertAvisAppelOffres.csv'
 ];
 
+const LOCAL_CSV_FILES = [
+    './newTenderNotice.csv',
+    './openTenderNotice.csv'
+];
+
 const SearchBar: React.FC = () => {
     const [contractsData, setContractsData] = useState<any[]>([]);
     const [searchTerm, setSearchTerm] = useState('');
@@ -23,23 +28,33 @@ const SearchBar: React.FC = () => {
     const [selectedContractValue, setSelectedContractValue] = useState<'All' | '<$10k' | '$10k - $20k' | '$20k+'>('All');
     const [filtersOpen, setFiltersOpen] = useState(false);
 
-    // Load and parse both CSV files when the component mounts
     useEffect(() => {
         const fetchAndParseCSV = async (url: string) => {
-            const response = await fetch(`https://corsproxy.io/?${url}`);
+            const response = await fetch(`https://corsproxy.io/?url=${url}`);
             const data = await response.text();
             return new Promise<any>((resolve, reject) => {
                 Papa.parse(data, {
                     complete: (result: any) => resolve(result.data),
                     error: (error: any) => reject(error)
                 });
-                
             });
         };
 
-        // Fetch both CSVs and combine them
-        Promise.all(CSV_URLS.map(fetchAndParseCSV))
-            .then((dataArrays) => {
+        const loadLocalCSV = async (path: string) => {
+            const response = await fetch(path);
+            const data = await response.text();
+            return new Promise<any>((resolve, reject) => {
+                Papa.parse(data, {
+                    complete: (result: any) => resolve(result.data),
+                    error: (error: any) => reject(error)
+                });
+            });
+        };
+
+        const loadData = async () => {
+            try {
+                // Attempt to fetch remote CSV files
+                const dataArrays = await Promise.all(CSV_URLS.map(fetchAndParseCSV));
                 const allData = dataArrays.flat();
                 const contractsData = allData.map((row: any, index: number) => ({
                     id: index + 1,
@@ -58,11 +73,39 @@ const SearchBar: React.FC = () => {
                     link: row[63]
                 }));
                 setContractsData(contractsData);
-            })
-            .catch((error) => {
-                console.error('Error fetching CSV files:', error);
-            });
+            } catch (error) {
+                console.error('Error fetching remote CSV files, falling back to local files:', error);
+
+                try {
+                    // Attempt to load local CSV files
+                    const dataArrays = await Promise.all(LOCAL_CSV_FILES.map(loadLocalCSV));
+                    const allData = dataArrays.flat();
+                    const contractsData = allData.map((row: any, index: number) => ({
+                        id: index + 1,
+                        title: row[0],
+                        description: row[16],
+                        startdate: row[5],
+                        status: row[2],
+                        clientName: row[33],
+                        value: row[49],
+                        duration: row[34],
+                        contractType: row[7],
+                        location: row[8],
+                        companySize: row[9],
+                        distance: row[10],
+                        action: "Open",
+                        link: row[63]
+                    }));
+                    setContractsData(contractsData);
+                } catch (localError) {
+                    console.error('Error loading local CSV files:', localError);
+                }
+            }
+        };
+
+        loadData();
     }, []);
+
 
     const handleChangeSearchTerm = (event: React.ChangeEvent<HTMLInputElement>) => {
         setSearchTerm(event.target.value);
@@ -284,3 +327,4 @@ const SearchBar: React.FC = () => {
 };
 
 export default SearchBar;
+
