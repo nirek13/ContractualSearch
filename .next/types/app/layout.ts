@@ -1,4 +1,4 @@
-// File: /Users/nirekshetty/WebstormProjects/ContractualDatabase/ContractualDatabse/ContractualDatabase/Contractual/Contractual/app/layout.tsx
+// File: /Users/nirekshetty/WebstormProjects/ContractualSearch/app/layout.tsx
 import * as entry from '../../../app/layout.js'
 import type { ResolvingMetadata, ResolvingViewport } from 'next/dist/lib/metadata/types/metadata-interface.js'
 
